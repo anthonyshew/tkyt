@@ -29,7 +29,7 @@ export const appRouter = router({
   madLibBuilder: publicProcedure
     .input(
       z.object({
-        name: z.enum(["cats", "dogs"]),
+        name: z.string().nullable(),
         noun: z.string(),
         amount: z.number()
       }),
