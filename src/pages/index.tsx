@@ -1,36 +1,56 @@
-/**
- * This is a Next.js page.
- */
-import { trpc } from '../utils/trpc';
+import { trpc } from "../utils/trpc";
+import { useState } from "react";
 
 export default function IndexPage() {
-  // 💡 Tip: CMD+Click (or CTRL+Click) on `greeting` to go to the server definition
-  const result = trpc.greeting.useQuery({ name: 'client' });
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [noun, setNoun] = useState("");
 
-  if (!result.data) {
+  const count = trpc.countTemplates.useQuery();
+  const result = trpc.madLibBuilder.useMutation();
+
+  const handleClick = () => {
+    result.mutate({
+      name,
+      amount,
+      noun,
+    });
+  };
+
+  if (result.isLoading) {
     return (
-      <div style={styles}>
+      <div>
         <h1>Loading...</h1>
       </div>
     );
   }
+
   return (
-    <div style={styles}>
-      {/**
-       * The type is defined and can be autocompleted
-       * 💡 Tip: Hover over `data` to see the result type
-       * 💡 Tip: CMD+Click (or CTRL+Click) on `text` to go to the server definition
-       * 💡 Tip: Secondary click on `text` and "Rename Symbol" to rename it both on the client & server
-       */}
-      <h1>{result.data.text}</h1>
+    <div className="container">
+      <h1>Mad Lib Builder</h1>
+      <p>There are {count.data} templates.</p>
+      <input
+        type="text"
+        onChange={(e) => setName(e.target.value)}
+        value={name}
+      />
+
+      <input
+        type="text"
+        onChange={(e) => setAmount(Number(e.target.value))}
+        value={amount}
+      />
+
+      <input
+        type="text"
+        onChange={(e) => setNoun(e.target.value)}
+        value={noun}
+      />
+      {result.error ? (
+        <p style={{ color: "red" }}>{result.error.message}</p>
+      ) : null}
+      <button onClick={() => handleClick()}>Fire Mutation</button>
+      <p>{result.data}</p>
     </div>
   );
 }
-
-const styles = {
-  width: '100vw',
-  height: '100vh',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-};
