@@ -29,20 +29,26 @@ export default function IndexPage() {
     <div className="container">
       <h1>Mad Lib Builder</h1>
       <p>There are {count.data} templates.</p>
+      <label htmlFor="name">Name</label>
       <input
         type="text"
+        name="name"
         onChange={(e) => setName(e.target.value)}
         value={name}
       />
 
+      <label htmlFor="number">Number</label>
       <input
         type="text"
+        name="number"
         onChange={(e) => setAmount(Number(e.target.value))}
         value={amount}
       />
 
+      <label htmlFor="noun">Noun</label>
       <input
         type="text"
+        name="noun"
         onChange={(e) => setNoun(e.target.value)}
         value={noun}
       />
