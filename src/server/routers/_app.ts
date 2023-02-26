@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { middleware, publicProcedure, router } from '~/server/trpc';
+import { publicProcedure, router } from '~/server/trpc';
 
 const templateOptions = [
   "Hi, my name is {name} and I have {amount} {noun}. ",
@@ -9,21 +9,9 @@ const templateOptions = [
   "{name} is the owner of {amount} {noun}s.",
 ]
 
-const ACCEPTABLE_NOUNS = ["dogs", "cats"]
-
-const logger = {
-  message: (str: string) => console.log(str),
-  error: (str: string) => console.error(str),
-  warn: (str: string) => console.warn(str)
-}
-
-const logMiddleware = middleware(({ path, next }) => {
-  logger.message(path)
-  return next()
-})
 
 export const appRouter = router({
-  countTemplates: publicProcedure.use(logMiddleware).query(() => {
+  countTemplates: publicProcedure.query(() => {
     return templateOptions.length
   }),
   madLibBuilder: publicProcedure
@@ -34,17 +22,6 @@ export const appRouter = router({
         amount: z.number()
       }),
     )
-    .use(logMiddleware)
-    .use(({ input, next }) => {
-      if (!ACCEPTABLE_NOUNS.includes(input.noun)) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "We only accept cats and dogs!"
-        })
-      }
-
-      return next()
-    })
     .mutation(({ input }) => {
       const randomIndex = Math.floor(Math.random() * ((templateOptions.length - 1) - 0))
 
